@@ -1,0 +1,35 @@
+version: '2'
+services:
+  varnish:
+      image: eeacms/varnish
+      restart: always
+      depends_on:
+          - web
+      ports:
+          - "5000:6081"
+          - "6085:6085"
+      environment:
+        VARNISH_MALLOC: "1g"
+        BACKENDS_PORT: "3000"
+        BACKENDS: "web"
+        DNS_ENABLED: "true"
+        BACKENDS_PROBE_INTERVAL: "3s"
+        BACKENDS_PROBE_TIMEOUT: "1s"
+        BACKENDS_PROBE_WINDOW: "3"
+        BACKENDS_PROBE_THRESHOLD: "2"
+        DASHBOARD_USER: "admin"
+        DASHBOARD_PASSWORD: "admin"
+        DASHBOARD_SERVERS: "varnish"
+        DASHBOARD_DNS_ENABLED: "true"        
+      links:
+        - web
+      volumes:
+          - ./default.vcl:/etc/varnish/default.vcl:ro
+  web:
+    build: .
+    command: npm run serve
+    volumes:
+      - .:/usr/app/
+      - /usr/app/node_modules
+    ports:
+      - "3000:3000"

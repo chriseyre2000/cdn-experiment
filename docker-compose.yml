@@ -24,3 +24,10 @@ services:
       - /usr/app/node_modules
     ports:
       - "3000:3000"
+  test:
+    build: .
+    command: "waitforit -address=http://varnish:6081 -timeout=60 -proto=http -- npm test"
+    depends_on:
+        - web
+        - varnish
+
